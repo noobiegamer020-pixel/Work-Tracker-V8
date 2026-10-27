@@ -1,0 +1,9 @@
+{
+  "appId": "com.worktracker.app",
+  "appName": "Work Tracker",
+  "webDir": "www",
+  "server": { "androidScheme": "https" },
+  "plugins": {
+    "LocalNotifications": { "smallIcon": "ic_stat_icon" }
+  }
+}

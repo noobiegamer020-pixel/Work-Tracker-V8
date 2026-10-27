@@ -1,0 +1,14 @@
+{
+  "name": "work-tracker-apk",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Work Tracker packaged as an Android app with Capacitor",
+  "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/app": "^6.0.0",
+    "@capacitor/camera": "^6.0.0",
+    "@capacitor/cli": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/local-notifications": "^6.0.0"
+  }
+}
