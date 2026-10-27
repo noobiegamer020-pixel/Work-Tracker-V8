@@ -1,0 +1,64 @@
+name: Build APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install packages
+        run: npm install
+
+      - name: Prepare the web app
+        run: node scripts/prepare-web.js
+
+      - name: Create the Android project
+        run: npx cap add android
+
+      - name: Add native files, permissions and signing
+        run: node scripts/patch-android.js
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Create a signing key if the repo has none
+        id: key
+        run: |
+          mkdir -p signing
+          if [ ! -f signing/work-tracker.jks ]; then
+            keytool -genkeypair -v -keystore signing/work-tracker.jks -alias worktracker \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass worktracker -keypass worktracker -dname "CN=Work Tracker"
+            echo "created=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Upload the APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Work-Tracker-APK
+          path: android/app/build/outputs/apk/release/*.apk
+
+      - name: Upload the new signing key (only the first time)
+        if: steps.key.outputs.created == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: KEEP-THIS-signing-key
+          path: signing/work-tracker.jks
