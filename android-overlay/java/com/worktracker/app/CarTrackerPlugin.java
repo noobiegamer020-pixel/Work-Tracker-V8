@@ -181,4 +181,20 @@ public class CarTrackerPlugin extends Plugin {
         r.put("act", a);
         call.resolve(r);
     }
+
+    /** Last Bluetooth event the receiver saw and whether the notification was sent. */
+    @PluginMethod
+    public void diag(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("d", CarStore.sp(getContext()).getString("diag", ""));
+        call.resolve(r);
+    }
+
+    /** Sends the same morning notification right now, to test it. */
+    @PluginMethod
+    public void testMorning(PluginCall call) {
+        CarStore.ensureChannels(getContext());
+        CarStore.morning(getContext(), CarStore.today(), "test", true);
+        call.resolve();
+    }
 }

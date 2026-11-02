@@ -1,5 +1,6 @@
 package com.worktracker.app;
 
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -21,12 +22,16 @@ public class CarReceiver extends BroadcastReceiver {
         if (d == null) return;
         String name = null;
         String addr = null;
+        boolean carClass = false;
         try {
             name = d.getName();
+            if ((name == null || name.isEmpty()) && Build.VERSION.SDK_INT >= 30) name = d.getAlias();
             addr = d.getAddress();
+            BluetoothClass bc = d.getBluetoothClass();
+            carClass = bc != null && bc.getDeviceClass() == BluetoothClass.Device.AUDIO_VIDEO_CAR_AUDIO;
         } catch (SecurityException e) {
             // Bluetooth permission not granted yet
         }
-        CarStore.onConnect(c, name, addr);
+        CarStore.onConnect(c, name, addr, carClass);
     }
 }
